@@ -2,6 +2,7 @@ package com.zkdesign.zookeeper;
 
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.log4j.Logger;
 import org.apache.zookeeper.*;
 import org.apache.zookeeper.data.ACL;
 import org.apache.zookeeper.data.Id;
@@ -20,16 +21,17 @@ import java.util.List;
 public class DataTest {
 
     ZooKeeper zooKeeper ;
+    private static Logger log = Logger.getLogger(DataTest.class);
 
-    private static  final String NODE_NAME = "/qiurunze" ;
+    private static  final String NODE_NAME = "/zsynode" ;
 
     @Before
     public void init() throws IOException {
-        String conn = "112.126.97.242:2181";
+        String conn = "192.168.23.33:2183";
         zooKeeper = new ZooKeeper(conn, 100000, new Watcher() {
             @Override
             public void process(WatchedEvent watchedEvent) {
-//                log.info("i am watch u "+watchedEvent.getPath());
+                log.info("i am watch u "+watchedEvent.getPath());
                 System.out.println(watchedEvent);
 
             }
@@ -40,17 +42,18 @@ public class DataTest {
     @Test
     public void getData() throws KeeperException, InterruptedException {
 
-        byte[] data = zooKeeper.getData("/qiurunze",false,null);
+        byte[] data = zooKeeper.getData("/zsynode",false,null);
         System.out.println(new String(data));
 
-//        log.info(new String(data));
+        log.info(new String(data));
     }
 
 
     @Test
+    //
     public void getDataWatch() throws KeeperException, InterruptedException {
 
-        byte[] data = zooKeeper.getData("/qiurunze",true,null);
+        byte[] data = zooKeeper.getData("/zsynode",true,null);
         log.info(new String(data));
         Thread.sleep(Long.MAX_VALUE);
     }
@@ -90,10 +93,10 @@ public class DataTest {
 
     @Test
     public void getData4() throws KeeperException, InterruptedException {
-        zooKeeper.getData("/qiurunze", false, new AsyncCallback.DataCallback() {
+        zooKeeper.getData("/zsynode", false, new AsyncCallback.DataCallback() {
             @Override
             public void processResult(int rc, String path, Object ctx, byte[] data, Stat stat) {
-                log.info("stat:{}",JSON.toJSON(stat));
+                log.info("stat:{}" + JSON.toJSON(stat));
             }
         }, "");
         Thread.sleep(Long.MAX_VALUE);
@@ -109,12 +112,12 @@ public class DataTest {
         list.add(acl);
         list.add(acl2);
         list.add(acl3);
-        zooKeeper.create("/qiurunze/gekkq", "hello".getBytes(), list, CreateMode.PERSISTENT);
+        zooKeeper.create("/zsynode/gekkq", "hello".getBytes(), list, CreateMode.PERSISTENT);
     }
 
     @Test
     public void getChild2() throws KeeperException, InterruptedException {
-        List<String> children = zooKeeper.getChildren("/qiurunze", event -> {
+        List<String> children = zooKeeper.getChildren("/zsynode", event -> {
             System.out.println(event.getPath());
             try {
                 zooKeeper.getChildren(event.getPath(), false);
